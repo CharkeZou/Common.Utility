@@ -1,6 +1,6 @@
-﻿ 
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -50,6 +50,7 @@ namespace Common.Utility
             }
             return list;
         }
+
         /// <summary>
         /// 把字符串转 按照, 分割 换为数据
         /// </summary>
@@ -59,6 +60,7 @@ namespace Common.Utility
         {
             return str.Split(new Char[] { ',' });
         }
+
         /// <summary>
         /// 把 List<string> 按照分隔符组装成 string
         /// </summary>
@@ -82,6 +84,7 @@ namespace Common.Utility
             }
             return sb.ToString();
         }
+
         /// <summary>
         /// 得到数组列表以逗号分隔的字符串
         /// </summary>
@@ -104,6 +107,7 @@ namespace Common.Utility
             }
             return sb.ToString();
         }
+
         /// <summary>
         /// 得到数组列表以逗号分隔的字符串
         /// </summary>
@@ -126,7 +130,6 @@ namespace Common.Utility
             }
         }
 
-
         #region 删除最后一个字符之后的字符
 
         /// <summary>
@@ -145,10 +148,7 @@ namespace Common.Utility
             return str.Substring(0, str.LastIndexOf(strchar));
         }
 
-        #endregion
-
-
-
+        #endregion 删除最后一个字符之后的字符
 
         /// <summary>
         /// 转全角的函数(SBC case)
@@ -213,8 +213,8 @@ namespace Common.Utility
             return list;
         }
 
-
         #region 将字符串样式转换为纯字符串
+
         /// <summary>
         ///  将字符串样式转换为纯字符串
         /// </summary>
@@ -238,9 +238,11 @@ namespace Common.Utility
             }
             return RetrunValue;
         }
-        #endregion
+
+        #endregion 将字符串样式转换为纯字符串
 
         #region 将字符串转换为新样式
+
         /// <summary>
         /// 将字符串转换为新样式
         /// </summary>
@@ -297,7 +299,8 @@ namespace Common.Utility
             }
             return ReturnValue;
         }
-        #endregion
+
+        #endregion 将字符串转换为新样式
 
         /// <summary>
         /// 分割字符串
@@ -314,6 +317,7 @@ namespace Common.Utility
             }
             return strArray;
         }
+
         public static string SqlSafeString(string String, bool IsDel)
         {
             if (IsDel)
@@ -328,6 +332,7 @@ namespace Common.Utility
         }
 
         #region 获取正确的Id，如果不是正整数，返回0
+
         /// <summary>
         /// 获取正确的Id，如果不是正整数，返回0
         /// </summary>
@@ -340,8 +345,11 @@ namespace Common.Utility
             else
                 return 0;
         }
-        #endregion
+
+        #endregion 获取正确的Id，如果不是正整数，返回0
+
         #region 检查一个字符串是否是纯数字构成的，一般用于查询字符串参数的有效性验证。
+
         /// <summary>
         /// 检查一个字符串是否是纯数字构成的，一般用于查询字符串参数的有效性验证。(0除外)
         /// </summary>
@@ -351,8 +359,11 @@ namespace Common.Utility
         {
             return QuickValidate("^[1-9]*[0-9]*$", _value);
         }
-        #endregion
+
+        #endregion 检查一个字符串是否是纯数字构成的，一般用于查询字符串参数的有效性验证。
+
         #region 快速验证一个字符串是否符合指定的正则表达式。
+
         /// <summary>
         /// 快速验证一个字符串是否符合指定的正则表达式。
         /// </summary>
@@ -369,10 +380,11 @@ namespace Common.Utility
             }
             return myRegex.IsMatch(_value);
         }
-        #endregion
 
+        #endregion 快速验证一个字符串是否符合指定的正则表达式。
 
         #region 根据配置对指定字符串进行 MD5 加密
+
         /// <summary>
         /// 根据配置对指定字符串进行 MD5 加密
         /// </summary>
@@ -385,9 +397,11 @@ namespace Common.Utility
 
             return s.ToLower().Substring(8, 16);
         }
-        #endregion
+
+        #endregion 根据配置对指定字符串进行 MD5 加密
 
         #region 得到字符串长度，一个汉字长度为2
+
         /// <summary>
         /// 得到字符串长度，一个汉字长度为2
         /// </summary>
@@ -407,9 +421,11 @@ namespace Common.Utility
             }
             return tempLen;
         }
-        #endregion
+
+        #endregion 得到字符串长度，一个汉字长度为2
 
         #region 截取指定长度字符串
+
         /// <summary>
         /// 截取指定长度字符串
         /// </summary>
@@ -453,11 +469,11 @@ namespace Common.Utility
                 tempString += "…";
             return tempString;
         }
-        #endregion
 
-
+        #endregion 截取指定长度字符串
 
         #region HTML转行成TEXT
+
         /// <summary>
         /// HTML转行成TEXT
         /// </summary>
@@ -472,8 +488,8 @@ namespace Common.Utility
             @"&(quot|#34);",
             @"&(amp|#38);",
             @"&(lt|#60);",
-            @"&(gt|#62);", 
-            @"&(nbsp|#160);", 
+            @"&(gt|#62);",
+            @"&(nbsp|#160);",
             @"&(iexcl|#161);",
             @"&(cent|#162);",
             @"&(pound|#163);",
@@ -495,17 +511,18 @@ namespace Common.Utility
             strOutput.Replace(">", "");
             strOutput.Replace("\r\n", "");
 
-
             return strOutput;
         }
-        #endregion
+
+        #endregion HTML转行成TEXT
 
         #region 判断对象是否为空
+
         /// <summary>
         /// 判断对象是否为空，为空返回true
         /// </summary>
         /// <typeparam name="T">要验证的对象的类型</typeparam>
-        /// <param name="data">要验证的对象</param>        
+        /// <param name="data">要验证的对象</param>
         public static bool IsNullOrEmpty<T>(T data)
         {
             //如果为null
@@ -563,6 +580,98 @@ namespace Common.Utility
             //不为空
             return false;
         }
-        #endregion
+
+        #endregion 判断对象是否为空
+
+        #region Byte相关
+
+        /// <summary>
+        /// 返回由字节数组中指定位置的两个字节转换来的 16 位有符号整型 (NetworkToHostOrder)。
+        /// </summary>
+        /// <param name="src">字节数组</param>
+        /// <param name="startIndex">读数起始位置</param>
+        /// <returns></returns>
+        public static short ReadShort(byte[] src, int startIndex)
+        {
+            return IPAddress.NetworkToHostOrder(BitConverter.ToInt16(src, startIndex));
+        }
+
+        /// <summary>
+        /// 返回由字节数组中指定位置的两个字节转换来的 32 位有符号整型 (NetworkToHostOrder)。
+        /// </summary>
+        /// <param name="src">字节数组</param>
+        /// <param name="startIndex">读数起始位置</param>
+        /// <returns></returns>
+        public static int ReadInt(byte[] src, int startIndex)
+        {
+            return IPAddress.NetworkToHostOrder(BitConverter.ToInt32(src, startIndex));
+        }
+
+        /// <summary>
+        /// 返回由字节数组中指定位置的两个字节转换来的 32 位无符号整型 (NetworkToHostOrder)。
+        /// </summary>
+        /// <param name="src">字节数组</param>
+        /// <param name="startIndex">读数起始位置</param>
+        /// <returns></returns>
+        public static uint ReadUInt(byte[] src, int startIndex)
+        {
+            return (uint)IPAddress.NetworkToHostOrder((long)BitConverter.ToUInt32(src, startIndex));
+        }
+
+        /// <summary>
+        /// 返回由字节数组中指定位置的两个字节转换来的 64 位有符号整型 (NetworkToHostOrder)。
+        /// </summary>
+        /// <param name="src">字节数组</param>
+        /// <param name="startIndex">读数起始位置</param>
+        /// <returns></returns>
+        public static long ReadLong(byte[] src, int startIndex)
+        {
+            return IPAddress.NetworkToHostOrder(BitConverter.ToInt64(src, startIndex));
+        }
+
+        /// <summary>
+        /// 获得byte数组。
+        /// </summary>
+        /// <param name="src">整型值</param>
+        /// <returns></returns>
+        public static byte[] GetBytes(int src)
+        {
+            return BitConverter.GetBytes(IPAddress.HostToNetworkOrder(src));
+        }
+
+        /// <summary>
+        /// 获得byte数组。
+        /// </summary>
+        /// <param name="src">短整型值</param>
+        /// <returns></returns>
+        public static byte[] GetBytes(short src)
+        {
+            return BitConverter.GetBytes(IPAddress.HostToNetworkOrder(src));
+        }
+
+        /// <summary>
+        /// 获得byte数组。
+        /// </summary>
+        /// <param name="src">长整型值</param>
+        /// <returns></returns>
+        public static byte[] GetBytes(long src)
+        {
+            return BitConverter.GetBytes(IPAddress.HostToNetworkOrder(src));
+        }
+
+        /// <summary>
+        /// 获得byte数组。
+        /// </summary>
+        /// <param name="src">整型值</param>
+        /// <param name="bytesRightLen">要靠右保留的byte个数</param>
+        /// <returns></returns>
+        public static byte[] RightBytes(byte[] src, int bytesRightLen)
+        {
+            byte[] retBytes = new byte[bytesRightLen];
+            Array.Copy(src, src.Length - bytesRightLen, retBytes, 0, bytesRightLen);
+            return retBytes;
+        }
+
+        #endregion Byte相关
     }
 }

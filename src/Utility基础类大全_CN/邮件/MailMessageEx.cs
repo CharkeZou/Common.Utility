@@ -6,9 +6,15 @@ using System.Net.Mime;
 using System.Text.RegularExpressions;
 namespace Utilities
 {
+    /// <summary>
+    /// This class adds a few internet mail headers not already exposed by the 
+    /// System.Net.MailMessage.  It also provides support to encapsulate the
+    /// nested mail attachments in the Children collection.
+    /// </summary>
     public class MailMessageEx : MailMessage
     {
         public const string EmailRegexPattern = "(['\"]{1,}.+['\"]{1,}\\s+)?<?[\\w\\.\\-]+@[^\\.][\\w\\.\\-]+\\.[a-z]{2,}>?";
+
         private long _octets;
         private int _messageNumber;
         private static readonly char[] AddressDelimiters = new char[]
@@ -19,233 +25,290 @@ namespace Utilities
         private List<MailMessageEx> _children;
         public long Octets
         {
-            get
-            {
-                return this._octets;
-            }
-            set
-            {
-                this._octets = value;
-            }
+            get { return _octets; }
+            set { _octets = value; }
         }
+
+        private int _messageNumber;
+
+        /// <summary>
+        /// Gets or sets the message number of the MailMessage on the POP3 server.
+        /// </summary>
+        /// <value>The message number.</value>
         public int MessageNumber
         {
-            get
-            {
-                return this._messageNumber;
-            }
-            internal set
-            {
-                this._messageNumber = value;
-            }
+            get { return _messageNumber; }
+            internal set { _messageNumber = value; }
         }
+
+
+        private static readonly char[] AddressDelimiters = new char[] { ',', ';' };
+
+        private List<MailMessageEx> _children;
+        /// <summary>
+        /// Gets the children MailMessage attachments.
+        /// </summary>
+        /// <value>The children MailMessage attachments.</value>
         public List<MailMessageEx> Children
         {
             get
             {
-                return this._children;
+                return _children;
             }
         }
+
+        /// <summary>
+        /// Gets the delivery date.
+        /// </summary>
+        /// <value>The delivery date.</value>
         public DateTime DeliveryDate
         {
             get
             {
-                string text = this.GetHeader("date");
-                if (string.IsNullOrEmpty(text))
+                string date = GetHeader(MailHeaders.Date);
+                if (string.IsNullOrEmpty(date))
                 {
                     return DateTime.MinValue;
                 }
-                if (text.IndexOf("(EST)") > 1 && text.IndexOf("-") > 1)
+
+                if ((date.IndexOf("(EST)") > 1) && (date.IndexOf("-") > 1))
                 {
-                    text = text.Substring(0, text.IndexOf("-"));
+                    date = date.Substring(0, date.IndexOf("-"));
                 }
-                return Convert.ToDateTime(text);
+                return Convert.ToDateTime(date);
             }
         }
+
+        /// <summary>
+        /// Gets the return address.
+        /// </summary>
+        /// <value>The return address.</value>
         public MailAddress ReturnAddress
         {
             get
             {
-                string header = this.GetHeader("reply-to");
-                if (string.IsNullOrEmpty(header))
+                string replyTo = GetHeader(MailHeaders.ReplyTo);
+                if (string.IsNullOrEmpty(replyTo))
                 {
                     return null;
                 }
-                return MailMessageEx.CreateMailAddress(header);
+
+                return CreateMailAddress(replyTo);
             }
         }
+
+        /// <summary>
+        /// Gets the routing.
+        /// </summary>
+        /// <value>The routing.</value>
         public string Routing
         {
-            get
-            {
-                return this.GetHeader("received");
-            }
+            get { return GetHeader(MailHeaders.Received); }
         }
+
+        /// <summary>
+        /// Gets the message id.
+        /// </summary>
+        /// <value>The message id.</value>
         public string MessageId
         {
-            get
-            {
-                return this.GetHeader("message-id");
-            }
+            get { return GetHeader(MailHeaders.MessageId); }
         }
+
         public string ReplyToMessageId
         {
-            get
-            {
-                return this.GetHeader("in-reply-to", true);
-            }
+            get { return GetHeader(MailHeaders.InReplyTo, true); }
         }
+
+        /// <summary>
+        /// Gets the MIME version.
+        /// </summary>
+        /// <value>The MIME version.</value>
         public string MimeVersion
         {
-            get
-            {
-                return this.GetHeader("mime-version");
-            }
+            get { return GetHeader(MimeHeaders.MimeVersion); }
         }
+
+        /// <summary>
+        /// Gets the content id.
+        /// </summary>
+        /// <value>The content id.</value>
         public string ContentId
         {
-            get
-            {
-                return this.GetHeader("content-id");
-            }
+            get { return GetHeader(MimeHeaders.ContentId); }
         }
+
+        /// <summary>
+        /// Gets the content description.
+        /// </summary>
+        /// <value>The content description.</value>
         public string ContentDescription
         {
-            get
-            {
-                return this.GetHeader("content-description");
-            }
+            get { return GetHeader(MimeHeaders.ContentDescription); }
         }
+
+        /// <summary>
+        /// Gets the content disposition.
+        /// </summary>
+        /// <value>The content disposition.</value>
         public ContentDisposition ContentDisposition
         {
             get
             {
-                string header = this.GetHeader("content-disposition");
-                if (string.IsNullOrEmpty(header))
+                string contentDisposition = GetHeader(MimeHeaders.ContentDisposition);
+                if (string.IsNullOrEmpty(contentDisposition))
                 {
                     return null;
                 }
-                return new ContentDisposition(header);
+
+                return new ContentDisposition(contentDisposition);
             }
         }
+
+        /// <summary>
+        /// Gets the type of the content.
+        /// </summary>
+        /// <value>The type of the content.</value>
         public ContentType ContentType
         {
             get
             {
-                string header = this.GetHeader("content-type");
-                if (string.IsNullOrEmpty(header))
+                string contentType = GetHeader(MimeHeaders.ContentType);
+                if (string.IsNullOrEmpty(contentType))
                 {
                     return null;
                 }
-                return MimeReader.GetContentType(header);
+
+                return MimeReader.GetContentType(contentType);
             }
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MailMessageEx"/> class.
+        /// </summary>
         public MailMessageEx()
+            : base()
         {
-            this._children = new List<MailMessageEx>();
+            _children = new List<MailMessageEx>();
         }
+
+        /// <summary>
+        /// Gets the header.
+        /// </summary>
+        /// <param name="header">The header.</param>
+        /// <returns></returns>
         private string GetHeader(string header)
         {
-            return this.GetHeader(header, false);
+            return GetHeader(header, false);
         }
+
         private string GetHeader(string header, bool stripBrackets)
         {
             if (stripBrackets)
             {
-                return MimeEntity.TrimBrackets(base.Headers[header]);
+                return MimeEntity.TrimBrackets(Headers[header]);
             }
-            return base.Headers[header];
+
+            return Headers[header];
         }
+
+        /// <summary>
+        /// Creates the mail message from entity.
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        /// <returns></returns>
         public static MailMessageEx CreateMailMessageFromEntity(MimeEntity entity)
         {
-            MailMessageEx mailMessageEx = new MailMessageEx();
-            string[] allKeys = entity.Headers.AllKeys;
-            for (int i = 0; i < allKeys.Length; i++)
+            MailMessageEx message = new MailMessageEx();
+            string value;
+            foreach (string key in entity.Headers.AllKeys)
             {
-                string text = allKeys[i];
-                string text2 = entity.Headers[text];
-                if (text2.Equals(string.Empty))
+                value = entity.Headers[key];
+                if (value.Equals(string.Empty))
                 {
-                    text2 = " ";
+                    value = " ";
                 }
-                mailMessageEx.Headers.Add(text.ToLowerInvariant(), text2);
-                string a;
-                if ((a = text.ToLowerInvariant()) != null)
+
+                message.Headers.Add(key.ToLowerInvariant(), value);
+
+                switch (key.ToLowerInvariant())
                 {
-                    if (!(a == "bcc"))
-                    {
-                        if (!(a == "cc"))
-                        {
-                            if (!(a == "from"))
-                            {
-                                if (!(a == "reply-to"))
-                                {
-                                    if (!(a == "subject"))
-                                    {
-                                        if (a == "to")
-                                        {
-                                            MailMessageEx.PopulateAddressList(text2, mailMessageEx.To);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        mailMessageEx.Subject = text2;
-                                    }
-                                }
-                                else
-                                {
-                                    mailMessageEx.ReplyTo = MailMessageEx.CreateMailAddress(text2);
-                                }
-                            }
-                            else
-                            {
-                                mailMessageEx.From = MailMessageEx.CreateMailAddress(text2);
-                            }
-                        }
-                        else
-                        {
-                            MailMessageEx.PopulateAddressList(text2, mailMessageEx.CC);
-                        }
-                    }
-                    else
-                    {
-                        MailMessageEx.PopulateAddressList(text2, mailMessageEx.Bcc);
-                    }
+                    case MailHeaders.Bcc:
+                        MailMessageEx.PopulateAddressList(value, message.Bcc);
+                        break;
+                    case MailHeaders.Cc:
+                        MailMessageEx.PopulateAddressList(value, message.CC);
+                        break;
+                    case MailHeaders.From:
+                        message.From = MailMessageEx.CreateMailAddress(value);
+                        break;
+                    case MailHeaders.ReplyTo:
+                        message.ReplyTo = MailMessageEx.CreateMailAddress(value);
+                        break;
+                    case MailHeaders.Subject:
+                        message.Subject = value;
+                        break;
+                    case MailHeaders.To:
+                        MailMessageEx.PopulateAddressList(value, message.To);
+                        break;
                 }
             }
-            return mailMessageEx;
+
+            return message;
         }
+
+        /// <summary>
+        /// Creates the mail address.
+        /// </summary>
+        /// <param name="address">The address.</param>
+        /// <returns></returns>
         public static MailAddress CreateMailAddress(string address)
         {
-            MailAddress result;
             try
             {
-                result = new MailAddress(address.Trim(new char[]
-                {
-                    '\t'
-                }));
+                return new MailAddress(address.Trim('\t'));
             }
-            catch
+            catch //(FormatException e)
             {
-                result = new MailAddress(address + "@mail.error");
+                //throw new Pop3Exception("Unable to create mail address from provided string: " + address, e);Mail Delivery System
+                return new MailAddress(address + "@mail.error");
             }
-            return result;
         }
+
+        /// <summary>
+        /// Populates the address list.
+        /// </summary>
+        /// <param name="addressList">The address list.</param>
+        /// <param name="recipients">The recipients.</param>
         public static void PopulateAddressList(string addressList, MailAddressCollection recipients)
         {
-            foreach (MailAddress current in MailMessageEx.GetMailAddresses(addressList))
+            foreach (MailAddress address in GetMailAddresses(addressList))
             {
-                recipients.Add(current);
+                recipients.Add(address);
             }
         }
+
+        /// <summary>
+        /// Gets the mail addresses.
+        /// </summary>
+        /// <param name="addressList">The address list.</param>
+        /// <returns></returns>
         private static IEnumerable<MailAddress> GetMailAddresses(string addressList)
         {
-            Regex regex = new Regex("(['\"]{1,}.+['\"]{1,}\\s+)?<?[\\w\\.\\-]+@[^\\.][\\w\\.\\-]+\\.[a-z]{2,}>?");
-            foreach (Match match in regex.Matches(addressList))
+            Regex email = new Regex(EmailRegexPattern);
+
+            foreach (Match match in email.Matches(addressList))
             {
-                yield return MailMessageEx.CreateMailAddress(match.Value);
+                yield return CreateMailAddress(match.Value);
             }
-            yield break;
+			yield break;
+
+            /*
+            string[] addresses = addressList.Split(AddressDelimiters);
+            foreach (string address in addresses)
+            {
+                yield return CreateMailAddress(address);
+            }*/
         }
     }
 }

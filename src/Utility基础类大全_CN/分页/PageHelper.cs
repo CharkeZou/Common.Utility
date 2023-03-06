@@ -1,14 +1,12 @@
 using System;
 using System.Text;
-using System.Web;
-using System.Web.UI.WebControls;
-using System.Text.RegularExpressions;
 
 namespace Utilities
 {
     public class PageValidate
     {
         #region 分页
+
         public static string paging(string url, string para, int sumpage, int page)
         {
             string result = string.Empty;
@@ -32,6 +30,7 @@ namespace Utilities
                     case 1:
                         sb.Append(string.Format("<p class=\"next\"><a href=\"{0}?page={1}{2}\">{3}</a> ", new object[] { url, page + 1, para, "下一页" }));
                         break;
+
                     default:
                         if (sumpage == page)
                         {
@@ -74,6 +73,7 @@ namespace Utilities
                     case 1:
                         sb.Append(string.Format("<a href=\"{0}?page={1}{2}\">{3}</a> ", new object[] { url, page + 1, para, "下一页" }));
                         break;
+
                     default:
                         if (sumpage == page)
                         {
@@ -108,6 +108,7 @@ namespace Utilities
                         case 1:
                             sb.Append(string.Format("<a href=\"?page={0}{1}\">{2}</a> ", new object[] { page + 1, para, "下一页" }));
                             break;
+
                         default:
                             if (sumpage == page)
                             {
@@ -241,6 +242,7 @@ namespace Utilities
                             //后一页图片
                             sb.Append(string.Format("<a href=\"?page={0}{1}\">{2}</a>", new object[] { page + 1, para, "<img src=\"images/right-icon.gif\" border=\"0\"/>" }));
                             break;
+
                         default:
                             if (sumpage == page)
                             {
@@ -292,6 +294,7 @@ namespace Utilities
                             //后一页图片
                             // sb.Append(string.Format("<a href=\"?page={0}{1}\">{2}</a>", new object[] { page + 1, para, "<img src=\"images/right-icon.gif\" border=\"0\"/>" }));
                             break;
+
                         default:
                             if (sumpage == page)
                             {
@@ -319,6 +322,70 @@ namespace Utilities
             }
             return sb.ToString();
         }
-        #endregion
+
+        #endregion 分页
+
+        #region 列表分页相关
+
+        /// <summary>
+        /// 获取分页起始索引（同时验证与修改参数）
+        /// </summary>
+        /// <param name="pageSize">每页显示记录数</param>
+        /// <param name="pageIndex">当前是第几页</param>
+        /// <returns></returns>
+        public static int GetStartRec(ref int pageSize, ref int pageIndex)
+        {
+            if (pageSize < 1) pageSize = 20;
+            if (pageIndex < 1) pageIndex = 1;
+            return pageSize * (pageIndex - 1) + 1;
+        }
+
+        /// <summary>
+        /// 获取分页终止索引（不验证参数）
+        /// </summary>
+        /// <param name="pageSize">每页显示记录数</param>
+        /// <param name="pageIndex">当前是第几页</param>
+        /// <returns></returns>
+        public static int GetEndRec(int pageSize, int pageIndex)
+        {
+            return pageSize * pageIndex;
+        }
+
+        /// <summary>
+        /// 获取分页起始索引（同时验证与修改参数）
+        /// </summary>
+        /// <param name="pageSize">每页显示记录数</param>
+        /// <param name="pageIndex">当前是第几页</param>
+        /// <returns></returns>
+        public static long GetStartRec(ref long pageSize, ref long pageIndex)
+        {
+            if (pageSize < 1) pageSize = 20;
+            if (pageIndex < 1) pageIndex = 1;
+            return pageSize * (pageIndex - 1) + 1;
+        }
+
+        /// <summary>
+        /// 获取分页终止索引（不验证参数）
+        /// </summary>
+        /// <param name="pageSize">每页显示记录数</param>
+        /// <param name="pageIndex">当前是第几页</param>
+        /// <returns></returns>
+        public static long GetEndRec(long pageSize, long pageIndex)
+        {
+            return pageSize * pageIndex;
+        }
+
+        /// <summary>
+        /// 根据记录总数与每页记录数，计算分页总数
+        /// </summary>
+        /// <param name="recordCount">记录总数</param>
+        /// <param name="pageSize">每页记录数</param>
+        /// <returns></returns>
+        public static int GetPageSize(int recordCount, int pageSize)
+        {
+            return (int)Math.Ceiling((double)recordCount / pageSize);
+        }
+
+        #endregion 列表分页相关
     }
 }

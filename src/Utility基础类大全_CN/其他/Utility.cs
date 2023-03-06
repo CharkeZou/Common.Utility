@@ -1,14 +1,13 @@
-
 using System;
-using System.IO;
-using System.Data;
 using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Drawing.Imaging;
+using System.Drawing.Printing;
+using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.UI;
-using System.Collections.Generic;
-using System.Text;
-using System.Drawing.Printing;
-using System.Drawing.Imaging;
 
 namespace Utilities
 {
@@ -17,8 +16,8 @@ namespace Utilities
     /// </summary>
     public class Utility : Page
     {
-
         #region 数据转换
+
         /// <summary>
         /// 返回对象obj的String值,obj为null时返回空值。
         /// </summary>
@@ -59,6 +58,7 @@ namespace Utilities
             catch
             { return returnValue; }
         }
+
         /// <summary>
         /// 将对象转换为数值(Long)类型,转换失败返回-1。
         /// </summary>
@@ -73,6 +73,7 @@ namespace Utilities
             catch
             { return -1L; }
         }
+
         /// <summary>
         /// 将对象转换为数值(Long)类型。
         /// </summary>
@@ -88,6 +89,7 @@ namespace Utilities
             catch
             { return returnValue; }
         }
+
         /// <summary>
         /// 将对象转换为数值(Decimal)类型,转换失败返回-1。
         /// </summary>
@@ -118,6 +120,7 @@ namespace Utilities
             catch
             { return returnValue; }
         }
+
         /// <summary>
         /// 将对象转换为数值(Double)类型,转换失败返回-1。
         /// </summary>
@@ -148,6 +151,7 @@ namespace Utilities
             catch
             { return returnValue; }
         }
+
         /// <summary>
         /// 将对象转换为数值(Float)类型,转换失败返回-1。
         /// </summary>
@@ -178,6 +182,7 @@ namespace Utilities
             catch
             { return returnValue; }
         }
+
         /// <summary>
         /// 将对象转换为数值(DateTime)类型,转换失败返回Now。
         /// </summary>
@@ -214,6 +219,7 @@ namespace Utilities
             catch
             { return returnValue; }
         }
+
         /// <summary>
         /// 从Boolean转换成byte,转换失败返回0。
         /// </summary>
@@ -260,6 +266,7 @@ namespace Utilities
                 }
             }
         }
+
         /// <summary>
         /// 从byte转换成Boolean,转换失败返回false。
         /// </summary>
@@ -277,6 +284,7 @@ namespace Utilities
                 return false;
             }
         }
+
         /// <summary>
         /// 从byte转换成Boolean。
         /// </summary>
@@ -295,9 +303,11 @@ namespace Utilities
                 return returnValue;
             }
         }
-        #endregion
+
+        #endregion 数据转换
 
         #region 数据判断
+
         /// <summary>
         /// 判断文本obj是否为空值。
         /// </summary>
@@ -405,9 +415,11 @@ namespace Utilities
             catch
             { return false; }
         }
-        #endregion
+
+        #endregion 数据判断
 
         #region 数据操作
+
         /// <summary>
         /// 去除字符串的所有空格。
         /// </summary>
@@ -495,6 +507,68 @@ namespace Utilities
             }
             return b;
         }
+
+        /// <summary>
+        /// 将以分隔符分隔的字符串转为int数组
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="seperator"></param>
+        /// <returns></returns>
+        public static int[] SplitToInt32Array(string str, string seperator)
+        {
+            string[] items = str.Split(new string[] { seperator }, StringSplitOptions.RemoveEmptyEntries);
+            int[] array = new int[items.Length];
+            for (int i = items.Length - 1; i >= 0; i--)
+            {
+                int value;
+                if (!int.TryParse(items[i], out value))
+                    return null;
+                array[i] = value;
+            }
+
+            return array;
+        }
+
+        /// <summary>
+        /// 将以分隔符分隔的字符串转为int数组
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="seperators"></param>
+        /// <returns></returns>
+        public static int[] SplitToInt32Array(string str, string[] seperators)
+        {
+            string[] items = str.Split(seperators, StringSplitOptions.RemoveEmptyEntries);
+            int[] array = new int[items.Length];
+            for (int i = items.Length - 1; i >= 0; i--)
+            {
+                int value;
+                if (!int.TryParse(items[i], out value))
+                    return null;
+                array[i] = value;
+            }
+            return array;
+        }
+
+        /// <summary>
+        /// 合并一组可枚举的对象为字符串
+        /// </summary>
+        /// <param name="enumerable">被枚举对象</param>
+        /// <param name="seperator">分隔符</param>
+        /// <returns></returns>
+        public static string ConcatEnumerable(IEnumerable enumerable, string seperator)
+        {
+            IEnumerator enumerator = enumerable.GetEnumerator();
+            if (!enumerator.MoveNext())
+                return string.Empty;
+            StringBuilder text = new StringBuilder(128);
+            text.Append(enumerator.Current.ToString());
+            while (enumerator.MoveNext())
+            {
+                text.Append(seperator + enumerator.Current);
+            }
+            return text.ToString();
+        }
+
         /// <summary>
         /// 替换字符串中的单引号。
         /// </summary>
@@ -504,7 +578,6 @@ namespace Utilities
         {
             return inputString.Replace("'", "''");
         }
-
 
         /// <summary>
         /// 判断两个字节数组是否具有相同值.
@@ -539,7 +612,6 @@ namespace Utilities
                 }
             }
         }
-
 
         /// <summary>
         /// 日期智能生成。
@@ -592,8 +664,6 @@ namespace Utilities
                 }
             }
         }
-
-
 
         /// <summary>
         /// 检查文件是否真实存在。
@@ -670,7 +740,6 @@ namespace Utilities
             return b;
         }
 
-
         /// <summary>
         /// 判断父子级关系是否正确。
         /// </summary>
@@ -707,7 +776,7 @@ namespace Utilities
             }
         }
 
-        #endregion
+        #endregion 数据操作
 
         #region 日期
 
@@ -774,7 +843,7 @@ namespace Utilities
             }
         }
 
-        #endregion
+        #endregion 日期
 
         #region 转换用户输入
 
@@ -785,7 +854,7 @@ namespace Utilities
         public static string ConvertStr(string inputString)
         {
             string retVal = inputString;
-            //retVal=retVal.Replace("&","&amp;"); 
+            //retVal=retVal.Replace("&","&amp;");
             retVal = retVal.Replace("\"", "&quot;");
             retVal = retVal.Replace("<", "&lt;");
             retVal = retVal.Replace(">", "&gt;");
@@ -804,7 +873,6 @@ namespace Utilities
             retVal = retVal.Replace("[/url]", "");
             return retVal;
         }
-
 
         /// <summary>
         /// 将html代码显示在网页上
@@ -839,8 +907,7 @@ namespace Utilities
             return str;
         }
 
-        #endregion
-
+        #endregion 转换用户输入
 
         //#region 弹出框
 
@@ -887,7 +954,6 @@ namespace Utilities
 
         //#endregion
 
-
         /// <summary>
         /// 设置绑定到DataGrid的DataTable的记录行数，如不够则添加空行
         /// </summary>
@@ -913,7 +979,6 @@ namespace Utilities
             }
         }
 
-
         public static string GetGuid(string guid)
         {
             return guid.Replace("-", "");
@@ -924,8 +989,9 @@ namespace Utilities
             return System.Configuration.ConfigurationManager.AppSettings[filePath];
         }
 
-        #region   字符串长度区分中英文截取
-        /// <summary>   
+        #region 字符串长度区分中英文截取
+
+        /// <summary>
         /// 截取文本，区分中英文字符，中文算两个长度，英文算一个长度
         /// </summary>
         /// <param name="str">待截取的字符串</param>
@@ -957,12 +1023,13 @@ namespace Utilities
             }
             return temp;
         }
-        #endregion
 
-   
-        //声明一个Stream对象的列表用来保存报表的输出数据 
+        #endregion 字符串长度区分中英文截取
+
+        //声明一个Stream对象的列表用来保存报表的输出数据
         //LocalReport对象的Render方法会将报表按页输出为多个Stream对象。
         private List<Stream> m_streams;
+
         //用来提供Stream对象的函数，用于LocalReport对象的Render方法的第三个参数。
         private Stream CreateStream(string name, string fileNameExtension, Encoding encoding, string mimeType, bool willSeek)
 
@@ -974,12 +1041,12 @@ namespace Utilities
             return stream;
         }
 
-        //用来记录当前打印到第几页了 
+        //用来记录当前打印到第几页了
         private int m_currentPageIndex;
 
         private void PrintPage(object sender, PrintPageEventArgs ev)
         {
-          int  pos = 6;
+            int pos = 6;
             //Metafile对象用来保存EMF或WMF格式的图形，
             //我们在前面将报表的内容输出为EMF图形格式的数据流。
             m_streams[m_currentPageIndex].Position = 0;
@@ -993,9 +1060,5 @@ namespace Utilities
             //设置是否需要继续打印
             ev.HasMorePages = (m_currentPageIndex < m_streams.Count);
         }
-
-       
     }
 }
-
-

@@ -928,6 +928,9 @@ namespace HD.DBHelper
                 return dataSet;
             }
         }
+        /// <summary>
+        /// 执行存储过程，返回DataSet(设定等待时间)
+        /// </summary>
         public static DataSet RunProcedure(string storedProcName, IDataParameter[] parameters, string tableName, int Times)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))

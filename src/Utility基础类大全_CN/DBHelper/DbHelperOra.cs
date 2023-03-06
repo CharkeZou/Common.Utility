@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.Data;
 using System.Data.OracleClient;
 using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
 
 namespace HD.DBHelper
 {
@@ -305,7 +306,9 @@ namespace HD.DBHelper
 						int rows=cmd.ExecuteNonQuery();
 						cmd.Parameters.Clear();
 						return rows;
+						System.Data.OracleClient.
 					}
+				
 					catch(System.Data.OracleClient.OracleException E)
 					{				
 						throw new Exception(E.Message);
